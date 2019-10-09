@@ -58,7 +58,7 @@ public class ScannerDaoImpl implements ScannerDao {
     @Override
     public String calculateAnswer(List<Option> options) {
         long goodCount = options.stream().filter(item -> item.isGood()).count();
-        if (goodCount > options.size()/2 + 1) {
+        if (goodCount >= options.size()/2 + 1) {
             return ANSWER_MAP.get(1);
         } else if (goodCount > options.size()/2 - 1) {
             return ANSWER_MAP.get(2);

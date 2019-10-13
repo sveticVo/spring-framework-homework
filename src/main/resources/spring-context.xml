@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fileService" class="ru.voskresenskaya.interview.service.FileServiceImpl">
+        <constructor-arg name="dao" ref="fileDao"/>
+    </bean>
+
+    <bean id="fileDao" class="ru.voskresenskaya.interview.dao.FileDaoImpl">
+        <constructor-arg name="loader" ref="resourceLoader"/>
+        <constructor-arg name="fileName" value="questions.csv"/>
+    </bean>
+
+    <bean id="scannerService" class="ru.voskresenskaya.interview.service.ScannerServiceImpl">
+        <constructor-arg name="fileService" ref="fileService"/>
+        <constructor-arg name="dao" ref="scannerDao"/>
+    </bean>
+
+    <bean id="scannerDao" class="ru.voskresenskaya.interview.dao.ScannerDaoImpl">
+    </bean>
+
+    <bean id="resourceLoader" class="org.springframework.core.io.DefaultResourceLoader">
+    </bean>
+
+</beans>

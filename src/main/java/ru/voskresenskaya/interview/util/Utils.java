@@ -48,12 +48,9 @@ public class Utils {
         return compareUserInput(in, value::equalsIgnoreCase);
     }
 
-    public static String compareFewUserInputDefault(Scanner in, String[] vars) throws InterviewException {
-        return compareUserInput(in, TRY_COUNT_DEFAULT_MESSAGE, TRY_AGAIN_DEFAULT_MESSAGE, compareFewUserInputPredicate(vars));
-    }
-
-    public String compareFewUserInput(Scanner in, String[] vars) throws InterviewException {
-        return compareUserInput(in, compareFewUserInputPredicate(vars));
+    public static String compareFewUserInputDefault(Scanner in, String tryCountDefaultMessage,
+                                                    String tryAgainDefaultMessage, String[] vars) throws InterviewException {
+        return compareUserInput(in, tryCountDefaultMessage, tryAgainDefaultMessage, compareFewUserInputPredicate(vars));
     }
 
     public String compareUserInput(Scanner in, Predicate<String> predicate) throws InterviewException {

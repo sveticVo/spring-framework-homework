@@ -43,16 +43,18 @@ public class InterviewLocaleServiceSimple implements InterviewLocaleService {
         }
         System.out.println(Utils.replaceSeparator(messageSource.getMessage("choose.locale", EMPTY_ARGS, defaultLocale)));
         Map<String, Locale> localeMap = new HashMap<>();
-        
+
         for (int i = 1; i <= locales.size(); i++) {
             LocaleItem item = locales.get(i-1);
             System.out.println(item.getName() + ": " + i);
             localeMap.put(String.valueOf(i), item.getLocale());
         }
 
-        String answer = null;
         try {
-            answer = Utils.compareFewUserInputDefault(in, localeMap.keySet().toArray(new String[] {}));
+            String tryCountDefaultMessage = messageSource.getMessage("try.count.error", EMPTY_ARGS, defaultLocale);
+            String tryAgainDefaultMessage = messageSource.getMessage("try.again", EMPTY_ARGS, defaultLocale);
+            String answer = Utils.compareFewUserInputDefault(in, tryCountDefaultMessage, tryAgainDefaultMessage,
+                    localeMap.keySet().toArray(new String[] {}));
             currentLocale = localeMap.get(answer);
         } catch (InterviewException e) {
             System.out.println(Utils.replaceSeparator(messageSource.getMessage("default.locale",

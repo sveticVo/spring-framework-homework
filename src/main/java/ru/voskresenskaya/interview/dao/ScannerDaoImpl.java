@@ -1,80 +1,92 @@
 package ru.voskresenskaya.interview.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
-import ru.voskresenskaya.interview.domain.Option;
+import ru.voskresenskaya.interview.service.MessageSourceService;
+import ru.voskresenskaya.interview.util.Utils;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
-import static ru.voskresenskaya.interview.Constants.*;
-
+@Service("scannerDao")
 public class ScannerDaoImpl implements ScannerDao {
 
-    private static final Map<Integer, String> ANSWER_MAP = new HashMap<>();
+    private FileDao fileDao;
+    private MessageSourceService messageSourceService;
+    private Utils util;
 
-    static {
-        initMap();
+    @Autowired
+    public ScannerDaoImpl(FileDao fileDao, MessageSourceService messageSourceService, Utils util) {
+        this.fileDao = fileDao;
+        this.messageSourceService = messageSourceService;
+        this.util = util;
     }
 
-    @Override
-    public List<Option> interview(Scanner in, List<String> questions) throws InterviewException {
-        if (OPTION_MAP.isEmpty()) {
-            throw new IllegalArgumentException("Не подготовлены ответы на вопросы.");
+    public List<String> interview(Scanner in) throws InterviewException, IOException {
+        Map<String, String> answerMap = fileDao.readAnswerFile();
+
+        if (answerMap == null || answerMap.isEmpty()) {
+            throw new IllegalArgumentException(Utils.replaceSeparator(messageSourceService.getMessage("answers.unprepared")));
         }
-        List<Option> resultList = new ArrayList<>();
+
+        List<String> questions = fileDao.readQuestionFile();
+        if (CollectionUtils.isEmpty(questions)) {
+            throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("questions.empty")));
+        }
+
+        List<String> resultList = new ArrayList<>();
 
         for (String question : questions) {
             System.out.println("\n" + question);
-            for (Map.Entry<String, Option> entry : OPTION_MAP.entrySet()) {
+            for (Map.Entry<String, String> entry : answerMap.entrySet()) {
                 String key = entry.getKey();
-                Option value = entry.getValue();
-                if (value == null || value.isEmpty()) {
-                    throw new InterviewException("Варианты ответов на вопросы составлены некорректно.");
+                String answer = entry.getValue();
+                if (StringUtils.isBlank(answer)) {
+                    throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.not.correct")));
                 }
-                System.out.println(String.format("\n  %s: %s", key, value.getName()));
+                System.out.println(String.format("\n  %s: %s", key, answer));
             }
-            System.out.println("\n-Укажите вариант ответа:");
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("answer.choose")));
 
-            int count = 1;
-            while (true) {
-                String answer = in.nextLine();
-                Option option = StringUtils.isNotBlank(answer)? OPTION_MAP.get(answer.trim()) : null;
-                if (option == null) {
-                    if (count == MAX_TRY_COUNT) {
-                        throw new InterviewException("- К сожалению, превышено количество попыток для ответа.");
-                    }
-                    count++;
-                    System.out.println("- Попробуйте еще раз:");
-                    continue;
-                }
-                resultList.add(option);
-                break;
-            }
+            Predicate<String> predicate = s -> {
+                String choice = StringUtils.isNotBlank(s)? answerMap.get(s.trim()) : null;
+                return StringUtils.isNotBlank(choice);
+            };
+            String answer = util.compareUserInput(in, predicate);
+            resultList.add(answer);
         }
 
         return resultList;
     }
 
-    @Override
-    public String calculateAnswer(List<Option> options) {
-        long goodCount = options.stream().filter(item -> item.isGood()).count();
-        if (goodCount > options.size()/2 + 1) {
-            return ANSWER_MAP.get(1);
-        } else if (goodCount > options.size()/2 - 1) {
-            return ANSWER_MAP.get(2);
-        } else {
-            return ANSWER_MAP.get(3);
+    public String calculateAnswer(List<String> choices) throws IOException, InterviewException {
+        Set<String> goodChoices = new HashSet<>();
+        goodChoices.add("1");
+        goodChoices.add("2");
+
+        long goodAnswerCount = choices.stream().filter(choice -> goodChoices.contains(choice)).count();
+
+        Map<String, String> totalAnswerMap = fileDao.readTotalAnswerFile();
+        if (totalAnswerMap == null || totalAnswerMap.isEmpty()) {
+            throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("test.not.correct")));
         }
-    }
+        String totalAnswer;
+        if (goodAnswerCount >= choices.size()/2 + 1) {
+            totalAnswer = totalAnswerMap.get("1");
+        } else if (goodAnswerCount > choices.size()/2 - 1) {
+            totalAnswer = totalAnswerMap.get("2");
+        } else {
+            totalAnswer = totalAnswerMap.get("3");
+        }
 
-    private static void initMap() {
-        OPTION_MAP.put("1", new Option(true, "Да"));
-        OPTION_MAP.put("2", new Option(true, "Скорее \"да\", чем \"нет\""));
-        OPTION_MAP.put("3", new Option(false, "Скорее \"нет\", чем \"да\""));
-        OPTION_MAP.put("4", new Option(false, "Нет"));
-
-        ANSWER_MAP.put(1, ANSWER_1);
-        ANSWER_MAP.put(2, ANSWER_2);
-        ANSWER_MAP.put(3, ANSWER_3);
+        if (StringUtils.isBlank(totalAnswer)) {
+            throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
+        }
+        return totalAnswer;
     }
 }

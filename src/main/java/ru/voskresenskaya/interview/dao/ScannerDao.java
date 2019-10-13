@@ -1,17 +1,14 @@
 package ru.voskresenskaya.interview.dao;
 
 import ru.voskresenskaya.interview.InterviewException;
-import ru.voskresenskaya.interview.domain.Option;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public interface ScannerDao {
-    Map<String, Option> OPTION_MAP = new HashMap<>();
 
-    List<Option> interview(Scanner in, List<String> questions) throws InterviewException;
+    List<String> interview(Scanner in) throws InterviewException, IOException;
 
-    String calculateAnswer(List<Option> options);
+    String calculateAnswer(List<String> choices) throws IOException, InterviewException;
 }

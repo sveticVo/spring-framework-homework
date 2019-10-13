@@ -1,87 +1,66 @@
 package ru.voskresenskaya.interview.service;
 
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
 import ru.voskresenskaya.interview.dao.ScannerDao;
-import ru.voskresenskaya.interview.domain.Option;
-
+import ru.voskresenskaya.interview.util.Utils;
 import java.util.*;
-import java.util.function.Predicate;
 
 import static ru.voskresenskaya.interview.Constants.*;
 
+@Service("scannerService")
 public class ScannerServiceImpl implements ScannerService {
-    private FileService fileService;
     private ScannerDao dao;
+    private MessageSourceService messageSourceService;
+    private Utils util;
 
-    private static final String READY_WORD = "+";
-    private static final String SUFFIX_ERROR_MESSAGE = "\nПопробуйте пройти тест в другой раз.";
+    private String READY_WORD = "+";
 
-
-    public ScannerServiceImpl(FileService fileService, ScannerDao dao) {
-        this.fileService = fileService;
+    @Autowired
+    public ScannerServiceImpl(ScannerDao dao, MessageSourceService messageSourceService, Utils util) {
         this.dao = dao;
-}
+        this.messageSourceService = messageSourceService;
+        this.util = util;
+    }
 
     public void spendTest() {
-        try (Scanner in = new Scanner(System.in)) {
-            System.out.print(TITLE);
+        Scanner in = null;
+        try {
+            in = new Scanner(System.in);
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
             Thread.sleep(2000);
-            System.out.print("\n\n- Давайте познакомися :) Как вас зовут?\n");
-            String name = getNotNullInput(in);
-            System.out.println("- Привет, " + name + "!");
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
+            String name = util.getNotNullInput(in);
+            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
 
             Thread.sleep(1200);
-            System.out.println("Ну что, начнем тест? Поставьте \"" + READY_WORD + "\", если готовы:");
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
 
-            compareUserInput(in, READY_WORD);
-            System.out.print("- Поехали!\n");
+            util.compareUserInput(in, READY_WORD);
+            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
 
-            List<String> questions = fileService.getQuestions();
-            if (CollectionUtils.isEmpty(questions)) {
-                throw new InterviewException("Уупс, к сожалению мы не успели обновить нашу базу с вопросами");
+            List<String> choices = dao.interview(in);
+            if (CollectionUtils.isEmpty(choices)) {
+                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
             }
 
-            List<Option> options = dao.interview(in, questions);
-            if (CollectionUtils.isEmpty(options)) {
-                throw new InterviewException("Ответы не были корректно обработаны.");
-            }
-
-            System.out.println(dao.calculateAnswer(options));
+            System.out.println(dao.calculateAnswer(choices));
+            in.close();
 
         } catch(Exception ex) {
-            System.out.println(String.format("Произошла техническая ошибка: %s. %s", ex.getMessage(), SUFFIX_ERROR_MESSAGE));
-            System.out.println(GOODBYE_MSG);
-            ex.getStackTrace();
-        }
-    }
-
-    private String getNotNullInput(Scanner in) throws InterviewException {
-        return compareUserInput(in, StringUtils::isNotBlank);
-    }
-
-    private String compareUserInput(Scanner in, final String value) throws InterviewException {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        return compareUserInput(in, value::equalsIgnoreCase);
-    }
-
-    private String compareUserInput(Scanner in, Predicate<String> predicate) throws InterviewException {
-        String answer;
-        int count = 1;
-        while (true) {
-            answer = in.nextLine().trim();
-            if (predicate.test(answer)) {
-                break;
+            try {
+                System.out.println(Utils.addNewLine(messageSourceService.getMessage("technical.error", new String[] {ex.getMessage()})));
+                System.out.println(GOODBYE_MSG);
+                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if (count == MAX_TRY_COUNT) {
-                throw new InterviewException("- К сожалению, превышено количество попыток для ответа.");
+        } finally {
+            if (in != null) {
+                in.close();
             }
-            count++;
-            System.out.println("- Попробуйте еще раз:");
         }
-        return answer;
     }
 }

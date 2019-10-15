@@ -3,7 +3,8 @@ package ru.voskresenskaya.interview;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import ru.voskresenskaya.interview.service.ScannerService;
+import ru.voskresenskaya.interview.service.InterviewService;
+import ru.voskresenskaya.interview.service.ScannerKeeper;
 
 @ComponentScan
 @Configuration
@@ -21,7 +22,10 @@ public class Main {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
 
-        ScannerService service = context.getBean(ScannerService.class);
+        InterviewService service = context.getBean(InterviewService.class);
         service.spendTest();
+
+        ScannerKeeper scanner = context.getBean(ScannerKeeper.class);
+        scanner.close();
     }
 }

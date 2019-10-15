@@ -2,32 +2,33 @@ package ru.voskresenskaya.interview.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
 import ru.voskresenskaya.interview.service.MessageSourceService;
+import ru.voskresenskaya.interview.service.ScannerService;
 import ru.voskresenskaya.interview.util.Utils;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
-@Service("scannerDao")
-public class ScannerDaoImpl implements ScannerDao {
+@Service("interviewDao")
+public class InterviewDaoImpl implements InterviewDao {
 
-    private FileDao fileDao;
-    private MessageSourceService messageSourceService;
-    private Utils util;
+    private final FileDao fileDao;
+    private final MessageSourceService messageSourceService;
+    private final ScannerService scannerService;
 
     @Autowired
-    public ScannerDaoImpl(FileDao fileDao, MessageSourceService messageSourceService, Utils util) {
+    public InterviewDaoImpl(FileDao fileDao, MessageSourceService messageSourceService, ScannerService scannerService) {
         this.fileDao = fileDao;
         this.messageSourceService = messageSourceService;
-        this.util = util;
+        this.scannerService = scannerService;
     }
 
-    public List<String> interview(Scanner in) throws InterviewException, IOException {
+    @Override
+    public List<String> interview() throws InterviewException, IOException {
         Map<String, String> answerMap = fileDao.readAnswerFile();
 
         if (answerMap == null || answerMap.isEmpty()) {
@@ -57,7 +58,7 @@ public class ScannerDaoImpl implements ScannerDao {
                 String choice = StringUtils.isNotBlank(s)? answerMap.get(s.trim()) : null;
                 return StringUtils.isNotBlank(choice);
             };
-            String answer = util.compareUserInput(in, predicate);
+            String answer = scannerService.compareUserInput(predicate);
             resultList.add(answer);
         }
 

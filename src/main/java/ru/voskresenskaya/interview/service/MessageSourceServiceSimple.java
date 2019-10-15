@@ -10,11 +10,11 @@ import static ru.voskresenskaya.interview.Constants.*;
 
 @Service("messageSourceService")
 public class MessageSourceServiceSimple implements MessageSourceService {
-    private MessageSource messageSource;
-    private InterviewLocaleService localeService;
+    private final MessageSource messageSource;
+    private final LocaleService localeService;
 
     @Autowired
-    public MessageSourceServiceSimple(MessageSource messageSource, InterviewLocaleService localeService) {
+    public MessageSourceServiceSimple(MessageSource messageSource, LocaleService localeService) {
         this.messageSource = messageSource;
         this.localeService = localeService;
     }

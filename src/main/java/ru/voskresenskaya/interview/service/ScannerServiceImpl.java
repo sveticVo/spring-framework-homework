@@ -1,66 +1,34 @@
 package ru.voskresenskaya.interview.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
-import ru.voskresenskaya.interview.dao.ScannerDao;
 import ru.voskresenskaya.interview.util.Utils;
-import java.util.*;
-
-import static ru.voskresenskaya.interview.Constants.*;
+import java.util.function.Predicate;
 
 @Service("scannerService")
 public class ScannerServiceImpl implements ScannerService {
-    private ScannerDao dao;
-    private MessageSourceService messageSourceService;
-    private Utils util;
+    private final ScannerKeeper scannerKeeper;
+    private final MessageSourceService messageSourceService;
 
-    private String READY_WORD = "+";
-
-    @Autowired
-    public ScannerServiceImpl(ScannerDao dao, MessageSourceService messageSourceService, Utils util) {
-        this.dao = dao;
+    public ScannerServiceImpl(MessageSourceService messageSourceService, ScannerKeeper scannerKeeper) {
         this.messageSourceService = messageSourceService;
-        this.util = util;
+        this.scannerKeeper = scannerKeeper;
     }
 
-    public void spendTest() {
-        Scanner in = null;
-        try {
-            in = new Scanner(System.in);
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
-            Thread.sleep(2000);
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
-            String name = util.getNotNullInput(in);
-            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
+    public String getNotNullInput() throws InterviewException {
+        return compareUserInput(StringUtils::isNotBlank);
+    }
 
-            Thread.sleep(1200);
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
-
-            util.compareUserInput(in, READY_WORD);
-            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
-
-            List<String> choices = dao.interview(in);
-            if (CollectionUtils.isEmpty(choices)) {
-                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
-            }
-
-            System.out.println(dao.calculateAnswer(choices));
-            in.close();
-
-        } catch(Exception ex) {
-            try {
-                System.out.println(Utils.addNewLine(messageSourceService.getMessage("technical.error", new String[] {ex.getMessage()})));
-                System.out.println(GOODBYE_MSG);
-                ex.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
+    public String compareUserInput(final String value) throws InterviewException {
+        if (StringUtils.isBlank(value)) {
+            return null;
         }
+        return compareUserInput(value::equalsIgnoreCase);
+    }
+
+    public String compareUserInput(Predicate<String> predicate) throws InterviewException {
+        return Utils.compareUserInput(scannerKeeper.getScanner(), messageSourceService.getMessage("try.count.error"),
+                messageSourceService.getMessage("try.again"), predicate);
     }
 }

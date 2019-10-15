@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
-public interface ScannerDao {
+public interface InterviewDao {
 
-    List<String> interview(Scanner in) throws InterviewException, IOException;
+    List<String> interview() throws InterviewException, IOException;
 
     String calculateAnswer(List<String> choices) throws IOException, InterviewException;
 }

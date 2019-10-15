@@ -2,7 +2,7 @@ package ru.voskresenskaya.interview.service;
 
 import java.util.Locale;
 
-public interface InterviewLocaleService {
+public interface LocaleService {
 
     Locale getLocale();
 

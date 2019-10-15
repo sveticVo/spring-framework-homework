@@ -18,43 +18,39 @@ import static ru.voskresenskaya.interview.Constants.ENCODING;
 
 @Service("fileDao")
 public class FileDaoImpl implements FileDao {
-    private Resource questionResource;
-    private Resource answerResource;
-    private Resource totalAnswerResource;
-    private MessageSourceService messageSourceService;
+    private final Resource questionResource;
+    private final Resource answerResource;
+    private final Resource totalAnswerResource;
+    private final MessageSourceService messageSourceService;
 
     enum ReturnAnswer {
-        Map, List
+        MAP, LIST
     }
 
     @Autowired
     public FileDaoImpl(ResourceLoader loader, MessageSourceService messageSourceService) {
-        try {
-            this.messageSourceService = messageSourceService;
-            this.questionResource = loader.getResource("classpath:" + messageSourceService.getMessage("question.file"));
-            this.answerResource = loader.getResource("classpath:" + messageSourceService.getMessage("answer.file"));
-            this.totalAnswerResource = loader.getResource("classpath:" + messageSourceService.getMessage("total.answer.file"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.messageSourceService = messageSourceService;
+        this.questionResource = loader.getResource("classpath:" + messageSourceService.getMessage("question.file"));
+        this.answerResource = loader.getResource("classpath:" + messageSourceService.getMessage("answer.file"));
+        this.totalAnswerResource = loader.getResource("classpath:" + messageSourceService.getMessage("total.answer.file"));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<String> readQuestionFile() throws IOException {
-        return (List<String>) readFile(questionResource, ReturnAnswer.List);
+        return (List<String>) readFile(questionResource, ReturnAnswer.LIST);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> readAnswerFile() throws IOException {
-        return (Map<String, String>) readFile(answerResource, ReturnAnswer.Map);
+        return (Map<String, String>) readFile(answerResource, ReturnAnswer.MAP);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> readTotalAnswerFile() throws IOException {
-        return (Map<String, String>) readFile(totalAnswerResource, ReturnAnswer.Map);
+        return (Map<String, String>) readFile(totalAnswerResource, ReturnAnswer.MAP);
     }
 
     private Object readFile(Resource resource, ReturnAnswer returnAnswer) throws IOException {
@@ -70,7 +66,7 @@ public class FileDaoImpl implements FileDao {
                 while (iterator.hasNext()) {
                     String item = iterator.next();
                     if (StringUtils.isNotBlank(item)) {
-                        if (ReturnAnswer.Map.equals(returnAnswer) && count == 0) {
+                        if (ReturnAnswer.MAP.equals(returnAnswer) && count == 0) {
                             key = item.trim();
                         } else {
                             item = item.replace(";", "\n");
@@ -81,7 +77,7 @@ public class FileDaoImpl implements FileDao {
                 }
                 String question = questionBuilder.toString();
                 if (StringUtils.isNotBlank(question)) {
-                    if (ReturnAnswer.Map.equals(returnAnswer)) {
+                    if (ReturnAnswer.MAP.equals(returnAnswer)) {
                         resultMap.put(key, question.substring(1).trim());
                     } else {
                         resultList.add(question.substring(1).trim());
@@ -89,6 +85,6 @@ public class FileDaoImpl implements FileDao {
                 }
             }
         }
-        return ReturnAnswer.Map.equals(returnAnswer)? resultMap : resultList;
+        return ReturnAnswer.MAP.equals(returnAnswer)? resultMap : resultList;
     }
 }

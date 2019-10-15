@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Service("fileService")
 public class FileServiceImpl implements FileService {
-    private FileDao dao;
+    private final FileDao dao;
 
     @Autowired
     public FileServiceImpl (FileDao dao) {

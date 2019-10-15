@@ -12,19 +12,22 @@ import java.util.*;
 
 import static ru.voskresenskaya.interview.Constants.EMPTY_ARGS;
 
-@Service("interviewLocaleService")
-public class InterviewLocaleServiceSimple implements InterviewLocaleService {
+@Service("localeService")
+public class LocaleServiceSimple implements LocaleService {
 
-    private Locale defaultLocale;
+    private final Locale defaultLocale;
     private List<LocaleItem> predefinedLocales;
     private Locale currentLocale;
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
+    private final ScannerKeeper scannerKeeper;
 
-    public InterviewLocaleServiceSimple(@Value("#{systemProperties['user.country']}") String userCountry,
-                                        @Value("#{systemProperties['user.language']}") String userLanguage,
-                                        MessageSource messageSource) {
+    public LocaleServiceSimple(@Value("#{systemProperties['user.country']}") String userCountry,
+                               @Value("#{systemProperties['user.language']}") String userLanguage,
+                               MessageSource messageSource,
+                               ScannerKeeper scannerKeeper) {
         this.messageSource = messageSource;
         this.defaultLocale = new Locale(userLanguage, userCountry);
+        this.scannerKeeper = scannerKeeper;
         initLocale();
     }
 
@@ -36,7 +39,6 @@ public class InterviewLocaleServiceSimple implements InterviewLocaleService {
     }
 
     private void initLocale() {
-        Scanner in = new Scanner(System.in);
         List<LocaleItem> locales = getPredefinedLocales();
         if (CollectionUtils.isEmpty(locales)) {
             return;
@@ -44,16 +46,16 @@ public class InterviewLocaleServiceSimple implements InterviewLocaleService {
         System.out.println(Utils.replaceSeparator(messageSource.getMessage("choose.locale", EMPTY_ARGS, defaultLocale)));
         Map<String, Locale> localeMap = new HashMap<>();
 
-        for (int i = 1; i <= locales.size(); i++) {
-            LocaleItem item = locales.get(i-1);
-            System.out.println(item.getName() + ": " + i);
-            localeMap.put(String.valueOf(i), item.getLocale());
+        for (int i = 0; i < locales.size(); i++) {
+            LocaleItem item = locales.get(i);
+            System.out.println(item.getName() + ": " + (i + 1));
+            localeMap.put(String.valueOf(i + 1), item.getLocale());
         }
 
         try {
             String tryCountDefaultMessage = messageSource.getMessage("try.count.error", EMPTY_ARGS, defaultLocale);
             String tryAgainDefaultMessage = messageSource.getMessage("try.again", EMPTY_ARGS, defaultLocale);
-            String answer = Utils.compareFewUserInputDefault(in, tryCountDefaultMessage, tryAgainDefaultMessage,
+            String answer = Utils.compareFewUserInputDefault(scannerKeeper.getScanner(), tryCountDefaultMessage, tryAgainDefaultMessage,
                     localeMap.keySet().toArray(new String[] {}));
             currentLocale = localeMap.get(answer);
         } catch (InterviewException e) {

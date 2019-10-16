@@ -30,25 +30,24 @@ public class InterviewServiceImpl implements InterviewService {
 
     public void spendTest() {
         try {
-            throw new IllegalArgumentException();
-//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
-//            Thread.sleep(2000);
-//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
-//            String name = scannerService.getNotNullInput();
-//            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
-//
-//            Thread.sleep(1200);
-//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
-//
-//            scannerService.compareUserInput(READY_WORD);
-//            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
-//
-//            List<String> choices = dao.interview();
-//            if (CollectionUtils.isEmpty(choices)) {
-//                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
-//            }
-//
-//            System.out.println(dao.calculateAnswer(choices));
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
+            Thread.sleep(2000);
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
+            String name = scannerService.getNotNullInput();
+            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
+
+            Thread.sleep(1200);
+            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
+
+            scannerService.compareUserInput(READY_WORD);
+            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
+
+            List<String> choices = dao.interview();
+            if (CollectionUtils.isEmpty(choices)) {
+                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
+            }
+
+            System.out.println(dao.calculateAnswer(choices));
 
         } catch(Exception ex) {
             System.out.println(Utils.addNewLine(messageSourceService.getMessage("technical.error", new String[] {ex.getMessage()})));

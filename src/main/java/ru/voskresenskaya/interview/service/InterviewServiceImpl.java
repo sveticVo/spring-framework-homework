@@ -1,7 +1,7 @@
 package ru.voskresenskaya.interview.service;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
@@ -9,7 +9,6 @@ import ru.voskresenskaya.interview.dao.InterviewDao;
 import ru.voskresenskaya.interview.util.Utils;
 
 import java.util.List;
-import java.util.Scanner;
 
 import static ru.voskresenskaya.interview.Constants.GOODBYE_MSG;
 
@@ -19,7 +18,7 @@ public class InterviewServiceImpl implements InterviewService {
     private final MessageSourceService messageSourceService;
     private final ScannerService scannerService;
 
-    private final Logger logger = Logger.getLogger(InterviewServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
 
     private String READY_WORD = "+";
 
@@ -31,24 +30,25 @@ public class InterviewServiceImpl implements InterviewService {
 
     public void spendTest() {
         try {
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
-            Thread.sleep(2000);
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
-            String name = scannerService.getNotNullInput();
-            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
-
-            Thread.sleep(1200);
-            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
-
-            scannerService.compareUserInput(READY_WORD);
-            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
-
-            List<String> choices = dao.interview();
-            if (CollectionUtils.isEmpty(choices)) {
-                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
-            }
-
-            System.out.println(dao.calculateAnswer(choices));
+            throw new IllegalArgumentException();
+//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("header")));
+//            Thread.sleep(2000);
+//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("greeting")));
+//            String name = scannerService.getNotNullInput();
+//            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("hello", new String[] {name})));
+//
+//            Thread.sleep(1200);
+//            System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
+//
+//            scannerService.compareUserInput(READY_WORD);
+//            System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
+//
+//            List<String> choices = dao.interview();
+//            if (CollectionUtils.isEmpty(choices)) {
+//                throw new InterviewException(Utils.replaceSeparator(messageSourceService.getMessage("answers.empty")));
+//            }
+//
+//            System.out.println(dao.calculateAnswer(choices));
 
         } catch(Exception ex) {
             System.out.println(Utils.addNewLine(messageSourceService.getMessage("technical.error", new String[] {ex.getMessage()})));

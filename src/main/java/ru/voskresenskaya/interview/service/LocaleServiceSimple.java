@@ -2,6 +2,8 @@ package ru.voskresenskaya.interview.service;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -12,8 +14,10 @@ import java.util.*;
 
 import static ru.voskresenskaya.interview.Constants.EMPTY_ARGS;
 
-@Service("localeService")
+@Service
 public class LocaleServiceSimple implements LocaleService {
+
+    private final Logger logger = LoggerFactory.getLogger(LocaleServiceSimple.class);
 
     private final Locale defaultLocale;
     private List<LocaleItem> predefinedLocales;
@@ -61,6 +65,7 @@ public class LocaleServiceSimple implements LocaleService {
         } catch (InterviewException e) {
             System.out.println(Utils.replaceSeparator(messageSource.getMessage("default.locale",
                     new String[] {defaultLocale.getDisplayName()}, defaultLocale)));
+            logger.error(e.getMessage(), e);
         }
     }
 

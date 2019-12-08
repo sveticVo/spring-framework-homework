@@ -1,6 +1,6 @@
 package ru.voskresenskaya.interview;
 
-public class InterviewException extends Exception {
+public class InterviewException extends RuntimeException {
     private Long errorCode;
 
     public InterviewException(String errorMessage) {

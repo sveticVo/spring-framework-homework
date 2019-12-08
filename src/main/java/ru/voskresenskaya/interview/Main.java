@@ -27,8 +27,5 @@ public class Main {
 
         InterviewService service = context.getBean(InterviewService.class);
         service.spendTest();
-
-        ScannerKeeper scanner = context.getBean(ScannerKeeper.class);
-        scanner.close();
     }
 }

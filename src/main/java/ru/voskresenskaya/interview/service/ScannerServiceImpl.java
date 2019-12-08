@@ -6,7 +6,7 @@ import ru.voskresenskaya.interview.InterviewException;
 import ru.voskresenskaya.interview.util.Utils;
 import java.util.function.Predicate;
 
-@Service("scannerService")
+@Service
 public class ScannerServiceImpl implements ScannerService {
     private final ScannerKeeper scannerKeeper;
     private final MessageSourceService messageSourceService;

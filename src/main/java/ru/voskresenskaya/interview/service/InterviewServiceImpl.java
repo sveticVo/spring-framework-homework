@@ -12,15 +12,13 @@ import java.util.List;
 
 import static ru.voskresenskaya.interview.Constants.GOODBYE_MSG;
 
-@Service("interviewService")
+@Service
 public class InterviewServiceImpl implements InterviewService {
     private final InterviewDao dao;
     private final MessageSourceService messageSourceService;
     private final ScannerService scannerService;
 
     private final Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
-
-    private String READY_WORD = "+";
 
     public InterviewServiceImpl(InterviewDao dao, MessageSourceService messageSourceService, ScannerService scannerService) {
         this.dao = dao;
@@ -39,6 +37,7 @@ public class InterviewServiceImpl implements InterviewService {
             Thread.sleep(1200);
             System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
 
+            String READY_WORD = "+";
             scannerService.compareUserInput(READY_WORD);
             System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
 

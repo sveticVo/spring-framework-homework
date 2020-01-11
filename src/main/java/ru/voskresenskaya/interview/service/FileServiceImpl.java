@@ -1,6 +1,5 @@
 package ru.voskresenskaya.interview.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.voskresenskaya.interview.dao.FileDao;
 
@@ -8,11 +7,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@Service("fileService")
+@Service
 public class FileServiceImpl implements FileService {
     private final FileDao dao;
 
-    @Autowired
     public FileServiceImpl (FileDao dao) {
         this.dao = dao;
     }

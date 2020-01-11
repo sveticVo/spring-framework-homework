@@ -1,6 +1,5 @@
 package ru.voskresenskaya.interview.service;
 
-import org.springframework.lang.Nullable;
 import java.util.Locale;
 
 public interface MessageSourceService {
@@ -9,5 +8,5 @@ public interface MessageSourceService {
 
     String getMessage(String var1);
 
-    String getMessage(String var1, @Nullable Object[] var2);
+    String getMessage(String var1, Object[] var2);
 }

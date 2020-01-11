@@ -1,7 +1,6 @@
 package ru.voskresenskaya.interview.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
@@ -13,14 +12,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
-@Service("interviewDao")
+@Service
 public class InterviewDaoImpl implements InterviewDao {
 
     private final FileDao fileDao;
     private final MessageSourceService messageSourceService;
     private final ScannerService scannerService;
 
-    @Autowired
     public InterviewDaoImpl(FileDao fileDao, MessageSourceService messageSourceService, ScannerService scannerService) {
         this.fileDao = fileDao;
         this.messageSourceService = messageSourceService;

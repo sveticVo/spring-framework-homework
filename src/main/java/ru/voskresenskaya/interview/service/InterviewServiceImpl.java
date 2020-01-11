@@ -1,7 +1,7 @@
 package ru.voskresenskaya.interview.service;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.voskresenskaya.interview.InterviewException;
@@ -9,19 +9,16 @@ import ru.voskresenskaya.interview.dao.InterviewDao;
 import ru.voskresenskaya.interview.util.Utils;
 
 import java.util.List;
-import java.util.Scanner;
 
 import static ru.voskresenskaya.interview.Constants.GOODBYE_MSG;
 
-@Service("interviewService")
+@Service
 public class InterviewServiceImpl implements InterviewService {
     private final InterviewDao dao;
     private final MessageSourceService messageSourceService;
     private final ScannerService scannerService;
 
-    private final Logger logger = Logger.getLogger(InterviewServiceImpl.class);
-
-    private String READY_WORD = "+";
+    private final Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
 
     public InterviewServiceImpl(InterviewDao dao, MessageSourceService messageSourceService, ScannerService scannerService) {
         this.dao = dao;
@@ -40,6 +37,7 @@ public class InterviewServiceImpl implements InterviewService {
             Thread.sleep(1200);
             System.out.println(Utils.addNewLine(messageSourceService.getMessage("ready")));
 
+            String READY_WORD = "+";
             scannerService.compareUserInput(READY_WORD);
             System.out.println(Utils.replaceSeparator(messageSourceService.getMessage("start")));
 

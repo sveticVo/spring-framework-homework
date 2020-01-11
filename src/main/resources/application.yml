@@ -1,0 +1,10 @@
+spring:
+  messages:
+    basename: bundle
+    encoding: UTF-8
+
+logging:
+  level:
+    root: ERROR
+    ru.voskresenskaya.interview: DEBUG
+  file: C:/Documents/logs/interview.log

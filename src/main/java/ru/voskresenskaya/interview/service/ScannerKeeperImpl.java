@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
-@Service("scannerKeeper")
+@Service
 public class ScannerKeeperImpl implements ScannerKeeper {
     private final Scanner in;
 
@@ -15,12 +15,5 @@ public class ScannerKeeperImpl implements ScannerKeeper {
     @Override
     public Scanner getScanner() {
         return in;
-    }
-
-    @Override
-    public void close() {
-        if (in != null) {
-            in.close();
-        }
     }
 }
